@@ -1,0 +1,13 @@
+---
+# handlers file for lighthouse-role
+- name: Nginx start
+  become: true
+  ansible.builtin.systemd:
+    state: started
+    name: nginx
+- name: Nginx reload
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nginx

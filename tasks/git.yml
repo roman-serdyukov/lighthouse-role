@@ -1,0 +1,15 @@
+---
+# Install Git
+- name: Install git in Debian
+  become: true
+  ansible.builtin.apt:
+    name: git
+    state: latest
+  when: ansible_os_family == "Debian"
+
+- name: Install git in RedHat
+  become: true
+  ansible.builtin.yum:
+    name: git
+    state: latest
+  when: ansible_os_family != "Debian"

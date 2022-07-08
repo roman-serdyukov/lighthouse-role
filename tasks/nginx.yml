@@ -1,0 +1,39 @@
+---
+# Install nginx for lighthouse
+- name: Install nginx in Debian
+  become: true
+  ansible.builtin.apt:
+    name: nginx
+    state: latest
+  when: ansible_os_family == "Debian"
+  notify: Nginx start
+
+- name: Install epel-release in RedHat
+  become: true
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+  when: ansible_os_family != "Debian"
+- name: Install nginx in RedHat
+  become: true
+  ansible.builtin.yum:
+    name: nginx
+    state: present
+  when: ansible_os_family != "Debian"
+  notify: Nginx start
+
+- name: Configure nginx in Debian
+  become: true
+  ansible.builtin.template:
+    src: templates/nginx.deb.conf.j2
+    dest: /etc/nginx/nginx.conf
+  when: ansible_os_family == "Debian"
+  notify: Nginx reload
+
+- name: Configure nginx in RedHat
+  become: true
+  ansible.builtin.template:
+    src: templates/nginx.red.conf.j2
+    dest: /etc/nginx/nginx.conf
+  when: ansible_os_family != "Debian"
+  notify: Nginx reload   

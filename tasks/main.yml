@@ -1,0 +1,37 @@
+---
+# tasks file for lighthouse-role
+- include_tasks: nginx.yml
+
+- include_tasks: git.yml
+
+- name: Install git in RedHat
+  become: true
+  ansible.builtin.yum:
+    name: git
+    state: latest
+  when: ansible_os_family != "Debian"
+
+- name: Download lighthouse
+  become: true
+  ansible.builtin.git:
+    repo: "{{ lighthouse_src }}"
+    version: master
+    dest: "{{ lighthouse_location }}"
+
+- name: Configure nginx for lighthouse in Debian
+  become: true
+  ansible.builtin.template:
+    src: templates/lighthouse.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: '0644'
+  when: ansible_os_family == "Debian"
+  notify: Nginx reload
+
+- name: Configure nginx for lighthouse in RedHat
+  become: true
+  ansible.builtin.template:
+    src: templates/lighthouse.conf.j2
+    dest: /etc/nginx/conf.d/default.conf
+    mode: '0644'
+  when: ansible_os_family != "Debian"
+  notify: Nginx reload
